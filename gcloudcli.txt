@@ -1,0 +1,10 @@
+(Windows) 
+Install gcloud cli and sign in after done.
+
+1. https://console.cloud.google.com/home/dashboard?hl=en&project=ferrous-arena-458211-h0&cloudshell=true
+2. Click on active shell on top right 
+3. git clone https://github.com/GoogleCloudPlatform/python-docs-samples
+4. cd python-docs-samples/appengine/standard_python3/hello_world
+5. gcloud app create
+6. gcloud app deploy 
+7. gcloud app browse
