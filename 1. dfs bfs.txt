@@ -1,0 +1,107 @@
+------------------------------------------------------------
+AI PRACTICAL 1
+------------------------------------------------------------
+Title of the Assignment:
+Implement Depth First Search (DFS) and Breadth First Search (BFS) using an undirected graph.
+
+Objective:
+To understand and implement graph traversal algorithms (DFS & BFS) using Python and observe how nodes are visited.
+
+------------------------------------------------------------
+CODE:
+------------------------------------------------------------
+
+# Step 1: Create Graph Using Adjacency List
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+
+# Step 2: Implement DFS (Recursive)
+def dfs(graph, node, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(node)
+    print(node, end=' ')
+    for neighbour in graph[node]:
+        if neighbour not in visited:
+            dfs(graph, neighbour, visited)
+
+# Step 3: Implement BFS (Queue Based)
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+
+    while queue:
+        node = queue.popleft()
+        print(node, end=' ')
+        for neighbour in graph[node]:
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+
+# Step 4: Run DFS and BFS
+print("DFS Traversal starting from A:")
+dfs(graph, 'A')
+
+print("\n\nBFS Traversal starting from A:")
+bfs(graph, 'A')
+
+------------------------------------------------------------
+SAMPLE OUTPUT:
+------------------------------------------------------------
+DFS Traversal starting from A:
+A B D E F C
+
+BFS Traversal starting from A:
+A B C D E F
+
+------------------------------------------------------------
+EXPLANATION OF KEY STEPS:
+------------------------------------------------------------
+• Graph Representation – adjacency list in a Python dictionary.
+• DFS – explores depth-first using recursion.
+• BFS – explores breadth-first using a queue (FIFO).
+• Visited set prevents infinite loops in cyclic graphs.
+
+------------------------------------------------------------
+INSIGHTS / OBSERVATIONS:
+------------------------------------------------------------
+1. DFS goes deep into each branch before backtracking.
+2. BFS visits nodes level by level.
+3. BFS is suitable for finding shortest paths in unweighted graphs.
+4. Both methods ensure all reachable nodes are visited once.
+
+------------------------------------------------------------
+CONCLUSION:
+------------------------------------------------------------
+DFS and BFS successfully traverse the graph using two different strategies.
+DFS is depth-oriented, while BFS is level-oriented and ideal for shortest path detection.
+
+------------------------------------------------------------
+VIVA QUESTIONS:
+------------------------------------------------------------
+Q1. What is DFS?
+→ DFS explores a graph deeply node by node before backtracking.
+
+Q2. Which data structure is used in BFS?
+→ Queue (FIFO).
+
+Q3. What is an adjacency list?
+→ A representation of nodes and their neighbors.
+
+Q4. Why do we maintain a visited set?
+→ To avoid revisiting nodes and entering infinite loops.
+
+Q5. Which algorithm finds the shortest path in an unweighted graph?
+→ BFS.
+
+Q6. Is DFS recursive or iterative?
+→ DFS is commonly implemented using recursion.

@@ -1,0 +1,206 @@
+------------------------------------------------------------
+AI PRACTICAL 5
+------------------------------------------------------------
+Title of the Assignment:
+Develop an elementary rule-based chatbot for a simple customer interaction application.
+
+Objective:
+To build a basic conversational agent that can handle greetings, product queries, order status checks, FAQs, and small talk using rule-based patterns.
+
+------------------------------------------------------------
+CODE:
+------------------------------------------------------------
+# Elementary Chatbot (Rule-based)
+# No external libraries required — pure Python
+
+import re
+import random
+import time
+
+# Small knowledge base / sample product info & orders
+PRODUCTS = {
+    'laptop': 'Model X200 - 8GB RAM, 512GB SSD, Price: ₹45,000',
+    'headphones': 'Acme SoundPro - Noise Cancelling, Price: ₹2,499',
+    'phone': 'Zenfone Z5 - 6GB RAM, 128GB Storage, Price: ₹18,999'
+}
+
+ORDERS = {
+    'ORD123': {'status': 'Shipped', 'eta': '2 days'},
+    'ORD456': {'status': 'Processing', 'eta': '5 days'},
+    'ORD789': {'status': 'Delivered', 'eta': 'Already delivered'}
+}
+
+# Utility functions
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)  # remove punctuation
+    return text.strip()
+
+def extract_order_id(text):
+    # Simple pattern: ORD followed by digits
+    match = re.search(r'\bord(?:er)?\s*(id)?\s*[:#-]?\s*(\d+)|\b(ord\d{3,})\b', text)
+    if match:
+        # Try to find ORDxxx pattern
+        groups = [g for g in match.groups() if g]
+        for g in groups[::-1]:
+            if g.upper().startswith('ORD'):
+                return g.upper()
+            if g.isdigit():
+                return 'ORD' + g
+    # fallback: look for ORD followed by digits
+    match2 = re.search(r'(ord\d{3,})', text)
+    if match2:
+        return match2.group(1).upper()
+    return None
+
+# Rule-based response generator
+def get_response(user_input):
+    text = clean_text(user_input)
+
+    # Greetings
+    if re.search(r'\b(hi|hello|hey|good morning|good afternoon|good evening)\b', text):
+        return random.choice([
+            "Hello! 👋 How can I help you today?",
+            "Hi there! What can I do for you?",
+            "Hey! Need help with an order or product info?"
+        ])
+
+    # Farewell
+    if re.search(r'\b(bye|goodbye|see you|take care)\b', text):
+        return random.choice([
+            "Goodbye! Have a great day! 😊",
+            "See you soon — reach out if you need anything else.",
+            "Thanks for visiting. Bye!"
+        ])
+
+    # Ask for product info
+    if re.search(r'\b(product|info|details|price|cost|specifications)\b', text) and any(p in text for p in PRODUCTS):
+        for p in PRODUCTS:
+            if p in text:
+                return f"Product info for **{p}**: {PRODUCTS[p]}"
+
+    # General product listing
+    if re.search(r'\b(show|list|what products|available)\b', text):
+        items = ', '.join(PRODUCTS.keys())
+        return f"We currently have: {items}. Which product would you like details for?"
+
+    # Order status check
+    if re.search(r'\b(order|status|track|tracking)\b', text):
+        order_id = extract_order_id(user_input)
+        if order_id:
+            info = ORDERS.get(order_id)
+            if info:
+                return f"Order {order_id} is **{info['status']}**. ETA: {info['eta']}."
+            else:
+                return f"Sorry, I can't find order ID {order_id}. Please check and try again."
+        else:
+            return "Please provide your Order ID (e.g., ORD123) so I can check the status."
+
+    # Returns / refund policy
+    if re.search(r'\b(return|refund|exchange|warranty)\b', text):
+        return ("Our return policy: Items can be returned within 7 days of delivery in original condition. "
+                "Refunds processed within 5-7 business days after we receive the item.")
+
+    # Small talk / thanks
+    if re.search(r'\b(thanks|thank you|thx|awesome)\b', text):
+        return "You're welcome! Happy to help. 😊"
+
+    # Ask to speak to human
+    if re.search(r'\b(human|agent|representative|support)\b', text):
+        return "I can connect you to a human agent. Please hold on while I transfer you... (simulated)."
+
+    # Product search by keyword
+    for p in PRODUCTS:
+        if re.search(r'\b' + re.escape(p) + r's?\b', text):
+            return f"Here are details for **{p}**: {PRODUCTS[p]}"
+
+    # Fallback / Clarification
+    return ("Sorry, I didn't understand that. You can ask things like:\n"
+            "• 'Show products' \n"
+            "• 'Tell me about laptop' \n"
+            "• 'Track order ORD123' \n"
+            "• 'What is the return policy?'")
+
+# Simple interactive loop (can be stopped by typing 'exit' or 'bye')
+def chat():
+    print("SimpleBot: Hello! I'm SimpleBot — type 'exit' to quit.")
+    while True:
+        user = input("You: ").strip()
+        if not user:
+            print("SimpleBot: Please type something or 'exit' to quit.")
+            continue
+        if user.lower() in ['exit', 'quit']:
+            print("SimpleBot: Bye! Have a nice day.")
+            break
+        response = get_response(user)
+        # simulate typing
+        time.sleep(0.4)
+        print("SimpleBot:", response)
+
+# If run as script, start chat
+if __name__ == '__main__':
+    chat()
+
+------------------------------------------------------------
+SAMPLE OUTPUT:
+------------------------------------------------------------
+SimpleBot: Hello! I'm SimpleBot — type 'exit' to quit.
+You: Hi
+SimpleBot: Hi there! What can I do for you?
+You: Show products
+SimpleBot: We currently have: laptop, headphones, phone. Which product would you like details for?
+You: Tell me about laptop
+SimpleBot: Product info for **laptop**: Model X200 - 8GB RAM, 512GB SSD, Price: ₹45,000
+You: Track order ORD123
+SimpleBot: Order ORD123 is **Shipped**. ETA: 2 days.
+You: What is your return policy?
+SimpleBot: Our return policy: Items can be returned within 7 days of delivery in original condition. Refunds processed within 5-7 business days after we receive the item.
+You: Thanks
+SimpleBot: You're welcome! Happy to help. 😊
+You: exit
+SimpleBot: Bye! Have a nice day.
+
+------------------------------------------------------------
+EXPLANATION OF KEY STEPS:
+------------------------------------------------------------
+• Rule-based approach: The bot matches input text against regex patterns and keywords.  
+• Knowledge base: Small in-memory dictionaries for PRODUCTS and ORDERS.  
+• Order extraction: `extract_order_id()` uses regex to find order IDs like ORD123.  
+• Responses: Deterministic replies for matched intents; fallback message for unknown inputs.  
+• Interactive loop: `chat()` runs a REPL; type 'exit' to quit.
+
+------------------------------------------------------------
+INSIGHTS / OBSERVATIONS:
+------------------------------------------------------------
+1. Rule-based chatbots are simple to implement and work well for constrained domains.  
+2. They fail when language variety increases — require many patterns to cover variability.  
+3. For scalability, consider using intent classification (ML) or retrieval-based responses.  
+4. Add logging of unknown queries to iteratively improve rules and coverage.
+
+------------------------------------------------------------
+CONCLUSION:
+------------------------------------------------------------
+This elementary chatbot demonstrates core conversational functionality for customer support: greetings, product info, order status, FAQs, and graceful fallbacks. It is suitable for lab demonstration and can be extended with NLP, databases, or APIs.
+
+------------------------------------------------------------
+VIVA QUESTIONS:
+------------------------------------------------------------
+Q1. What is a rule-based chatbot?
+→ A chatbot that uses manually written rules and pattern matching to map user inputs to responses.
+
+Q2. How does this bot detect order IDs?
+→ Using regular expressions that match patterns like ORD123.
+
+Q3. What are limitations of rule-based bots?
+→ Hard to scale, brittle to varied language, needs many rules, poor at handling unseen queries.
+
+Q4. How would you improve this chatbot?
+→ Add intent classification (ML), entity extraction (NER), connect to a DB/API, or use retrieval/generative models.
+
+Q5. When would you use a rule-based approach?
+→ For small, well-defined domains where user intents are limited and predictable.
+
+Q6. How do you handle unknown user queries?
+→ Provide a helpful fallback message and log the query for future rule additions.
+
+------------------------------------------------------------

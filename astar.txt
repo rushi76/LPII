@@ -1,0 +1,123 @@
+------------------------------------------------------------
+AI PRACTICAL 2
+------------------------------------------------------------
+Title of the Assignment:
+Implement A* (A-star) Algorithm for any game search problem.
+
+Objective:
+To understand and implement the A* search algorithm using heuristics for optimal pathfinding.
+
+------------------------------------------------------------
+CODE:
+------------------------------------------------------------
+# A* Search Algorithm Implementation
+# Example Problem: Find shortest path in a graph using A* heuristic
+
+from heapq import heappush, heappop
+
+# Step 1: Graph representation (each edge has a cost)
+graph = {
+    'A': {'B': 1, 'C': 3},
+    'B': {'A': 1, 'D': 3, 'E': 1},
+    'C': {'A': 3, 'F': 5},
+    'D': {'B': 3},
+    'E': {'B': 1, 'F': 2},
+    'F': {'C': 5, 'E': 2}
+}
+
+# Step 2: Heuristic values (Estimated cost to reach goal 'F')
+heuristic = {
+    'A': 6,
+    'B': 4,
+    'C': 4,
+    'D': 4,
+    'E': 2,
+    'F': 0
+}
+
+# Step 3: A* Function
+def a_star(graph, start, goal):
+    open_list = []
+    heappush(open_list, (0 + heuristic[start], start))  # (f_score, node)
+    
+    came_from = {}
+    g_score = {node: float('inf') for node in graph}
+    g_score[start] = 0
+
+    while open_list:
+        f, current = heappop(open_list)
+
+        if current == goal:
+            break
+
+        for neighbor, cost in graph[current].items():
+            temp_g = g_score[current] + cost
+
+            if temp_g < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = temp_g
+                f_score = temp_g + heuristic[neighbor]
+                heappush(open_list, (f_score, neighbor))
+
+    # Step 4: Reconstruct path
+    path = []
+    node = goal
+    while node:
+        path.append(node)
+        node = came_from.get(node)
+        if node is None:
+            break
+    return path[::-1]
+
+# Step 5: Run A* Algorithm from A to F
+path = a_star(graph, 'A', 'F')
+print("Shortest path using A*:", path)
+
+------------------------------------------------------------
+SAMPLE OUTPUT:
+------------------------------------------------------------
+Shortest path using A*: ['A', 'B', 'E', 'F']
+
+------------------------------------------------------------
+EXPLANATION OF KEY STEPS:
+------------------------------------------------------------
+• A* = g(n) + h(n)
+   g(n) → cost from start to node
+   h(n) → heuristic (estimated cost to goal)
+• Uses a priority queue (min-heap) for selecting best node.
+• Updates path when a lower-cost route is found.
+• Reconstructs path backward from goal.
+
+------------------------------------------------------------
+INSIGHTS / OBSERVATIONS:
+------------------------------------------------------------
+1. A* finds the optimal shortest path when heuristic is admissible.
+2. Combining actual cost + heuristic makes it faster than BFS/DFS.
+3. Path A → B → E → F is selected due to lowest estimated total cost.
+4. Heuristics influence speed and efficiency of A* search.
+
+------------------------------------------------------------
+CONCLUSION:
+------------------------------------------------------------
+A* algorithm successfully finds the shortest and most optimal path using both path cost and heuristic values. It is widely used in games, maps, and navigation systems.
+
+------------------------------------------------------------
+VIVA QUESTIONS:
+------------------------------------------------------------
+Q1. What is A* algorithm?
+→ A heuristic-based search algorithm that finds the optimal path using g(n) + h(n).
+
+Q2. What is heuristic?
+→ An estimated cost from the current node to the goal.
+
+Q3. What makes A* optimal?
+→ A* is optimal when its heuristic is admissible (never overestimates).
+
+Q4. Which data structure is used in A*?
+→ Priority queue (min-heap).
+
+Q5. Difference between A* and Dijkstra?
+→ A* uses heuristic; Dijkstra does not.
+
+Q6. Applications of A*?
+→ Google Maps, GPS navigation, video games, robotics path planning.
